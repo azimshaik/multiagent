@@ -63,6 +63,15 @@ sequenceDiagram
     DevOpsAgent->>DevOpsAgent: Execute "deploy_service"
     DevOpsAgent-->>Orchestrator: Return Result (JSON)
     Orchestrator-->>User: "Deployment Successful"
+
+    note over Orchestrator, QAAgent: Later...
+
+    User->>Orchestrator: "Run tests"
+    Orchestrator->>Registry: Lookup "qa"
+    Registry-->>Orchestrator: Return "http://localhost:8002"
+    Orchestrator->>QAAgent: HTTP POST /task (Action: run_tests)
+    QAAgent-->>Orchestrator: Return Result (Passed)
+    Orchestrator-->>User: "Tests Passed"
 ```
 
 ## Running the System
