@@ -6,6 +6,13 @@ This project implements a production-ready **Multi-Agent System (MAS)** designed
 
 The system is architected as a set of independent microservices, where each "Agent" runs as a distinct process. This decoupling allows for scalability and independent scaling of capabilities.
 
+
+### Agent Discovery & Communication (A2A)
+
+The system uses the **Agent-to-Agent (A2A)** protocol for discovery and communication.
+*   **Agent Cards**: Each agent (DevOps, QA) automatically generates and exposes an "Agent Card" — a standardized JSON description of its identity, capabilities, and tools.
+*   **A2A Server**: The `A2AServer` component wraps the ADK agent, serving the Agent Card and handling incoming task requests over HTTP.
+
 ### The Agent Hierarchy
 
 The system consists of three primary agents:
@@ -20,13 +27,13 @@ The system consists of three primary agents:
     *   **Capabilities**:
         *   `build_image`: Compiles the application code into a Docker container.
         *   `deploy_service`: Updates the Cloud Run service with the new image.
-    *   **Definition**: Defined in `agents/devops/agent.py`. It wraps Python functions as ADK Tools and exposes them via an A2A Server.
+    *   **Definition**: Defined in `agents/devops/agent.py`. It wraps Python functions as ADK Tools and uses `A2AServer` to expose an **Agent Card** listing these tools.
 
 3.  **QA Agent (The "Tester")**
     *   **Role**: A specialized worker focused on quality assurance.
     *   **Capabilities**:
         *   `run_tests`: Executes automated test suites (Frontend/Backend).
-    *   **Definition**: Defined in `agents/qa/agent.py`. It exposes testing functions as A2A-callable tools.
+    *   **Definition**: Defined in `agents/qa/agent.py`. It uses `A2AServer` to expose an **Agent Card** containing its testing tools.
 
 ## How the Orchestrator Functions
 
@@ -41,7 +48,9 @@ When a user sends a command like *"Please deploy the latest version"*, the embed
 ### 2. Execution Layer (Delegation)
 Once the intent is understood, the Orchestrator needs to technically communicate with the DevOps Agent.
 1.  **Tool Call**: The LLM generates a function call to its internal tool `send_message(agent_name="devops", action="deploy_service")`.
-2.  **Service Discovery**: The Orchestrator looks up "devops" in its internal registry to find the agent's network address (e.g., `http://localhost:8001`).
+2.  **Service Discovery**:
+    *   *Conceptually*: The Orchestrator would use `A2ACardResolver` to fetch the remote agent's **Agent Card** and dynamically learn its address and tools.
+    *   *Current Implementation*: For this workshop, we use manual registration to map "devops" to `http://localhost:8001`.
 3.  **A2A Protocol**: It constructs a structured A2A message containing the task details and sends it over HTTP to the DevOps Agent.
 4.  **Response Handling**: The DevOps Agent executes the task and returns a result, which the Orchestrator then summarizes back to the user.
 
