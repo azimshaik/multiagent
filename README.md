@@ -2,6 +2,20 @@
 
 This project implements a production-ready **Multi-Agent System (MAS)** designed to automate the lifecycle of the `snapstock` application. It leverages **Google's Agent Development Kit (ADK)** and the **Agent-to-Agent (A2A)** communication protocol to create a distributed network of specialized AI agents.
 
+
+## Project Structure
+
+```
+orchestrator_real/
+├── agents/
+│   ├── devops/         # DevOps Agent (Builder)
+│   ├── orchestrator/   # Orchestrator Agent (Brain)
+│   └── qa/             # QA Agent (Tester)
+├── tools/              # Shared tools
+├── requirements.txt    # Python dependencies
+└── setup.sh            # Setup script
+```
+
 ## System Architecture
 
 The system is architected as a set of independent microservices, where each "Agent" runs as a distinct process. This decoupling allows for scalability and independent scaling of capabilities.
