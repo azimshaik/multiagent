@@ -32,21 +32,28 @@ The system uses the **Agent-to-Agent (A2A)** protocol for discovery and communic
 The system consists of three primary agents:
 
 1.  **Orchestrator Agent (The "Brain")**
-    *   **Role**: Acts as the central controller and interface for the user.
-    *   **Responsibility**: It does not perform low-level tasks itself. Instead, it interprets user intent (e.g., "Deploy the app") and delegates the work to the appropriate specialist agent.
+    *   **Identity**: `orchestrator`
+    *   **Capabilities**: "You are an Orchestrator. Your goal is to manage deployments and testing by delegating to specialized agents."
+    *   **Tools**:
+        *   `send_message`: Delegates tasks to other agents via A2A.
+    *   **Role**: Acts as the central controller and interface for the user. It interprets user intent and delegates work.
     *   **Technology**: Uses a Large Language Model (Gemini) to reason about which tool to call.
 
 2.  **DevOps Agent (The "Builder")**
-    *   **Role**: A specialized worker focused on infrastructure and deployment.
-    *   **Capabilities**:
+    *   **Identity**: `devops`
+    *   **Capabilities**: "You are a DevOps engineer. You handle building and deploying applications."
+    *   **Tools**:
         *   `build_image`: Compiles the application code into a Docker container.
         *   `deploy_service`: Updates the Cloud Run service with the new image.
+    *   **Role**: A specialized worker focused on infrastructure and deployment.
     *   **Definition**: Defined in `agents/devops/agent.py`. It wraps Python functions as ADK Tools and uses `A2AServer` to expose an **Agent Card** listing these tools.
 
 3.  **QA Agent (The "Tester")**
-    *   **Role**: A specialized worker focused on quality assurance.
-    *   **Capabilities**:
+    *   **Identity**: `qa`
+    *   **Capabilities**: "You are a QA engineer. You run automated tests."
+    *   **Tools**:
         *   `run_tests`: Executes automated test suites (Frontend/Backend).
+    *   **Role**: A specialized worker focused on quality assurance.
     *   **Definition**: Defined in `agents/qa/agent.py`. It uses `A2AServer` to expose an **Agent Card** containing its testing tools.
 
 ## How the Orchestrator Functions
